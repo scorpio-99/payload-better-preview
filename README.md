@@ -1,6 +1,10 @@
 # payload-better-preview
 
+> **Work in progress** — This plugin is still in early development and not ready for production use.
+
 Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, nested block support, and smooth transitions.
+
+![Preview Hover Highlighting](./assets/demo.gif)
 
 **Phase 1** (current): Preview Hover Highlighting
 **Phase 2** (planned): Click in Preview → Focus block in Admin
@@ -17,18 +21,13 @@ Better live preview for [Payload CMS](https://payloadcms.com) — hover highligh
 
 ## Installation
 
-### 1. Add the plugin dependency
-
-```json
-// package.json
-{
-  "dependencies": {
-    "payload-better-preview": "link:./plugins/payload-better-preview"
-  }
-}
+```bash
+pnpm add github:scorpio-99/payload-better-preview
+# or
+npm install github:scorpio-99/payload-better-preview
 ```
 
-### 2. Register the plugin
+### 1. Register the plugin
 
 ```ts
 // payload.config.ts (or your plugins file)
@@ -41,7 +40,7 @@ export default buildConfig({
 })
 ```
 
-### 3. Add data attributes to block wrappers
+### 2. Add data attributes to block wrappers
 
 The plugin expects these attributes on your block wrapper elements:
 
@@ -63,7 +62,7 @@ Example:
 </div>
 ```
 
-### 4. Render `<PreviewToolbar />` in your page
+### 3. Render `<PreviewToolbar />` in your page
 
 Import the client component and render it conditionally in draft mode:
 
