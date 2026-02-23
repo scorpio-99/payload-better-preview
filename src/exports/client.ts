@@ -1,1 +1,1 @@
-export { BeforeDashboardClient } from '../components/BeforeDashboardClient.js'
+export { PreviewToolbar } from '../components/PreviewToolbar'

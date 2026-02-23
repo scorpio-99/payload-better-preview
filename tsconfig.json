@@ -11,24 +11,21 @@
     "skipLibCheck": true,
     "strict": true,
     "esModuleInterop": true,
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "emitDeclarationOnly": true,
+    "jsx": "react-jsx",
+    "noEmit": true,
     "target": "ES2022",
-    "composite": true,
     "plugins": [
       {
         "name": "next"
       }
-    ],
+    ]
   },
   "include": [
     "./src/**/*.ts",
-    "./src/**/*.tsx",
-    "./dev/next-env.d.ts",
-  ],
+    "./src/**/*.tsx"
+  ]
 }
