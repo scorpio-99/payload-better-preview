@@ -1,14 +1,10 @@
 # payload-better-preview
 
-> **v0.1.0** — Phase 1 (hover highlighting) is stable. Phases 2–3 are planned but not yet implemented.
+> **v0.2.0** — Phase 1 (hover highlighting) and Phase 3 (admin → preview sync) are stable. Phase 2 is planned.
 
-Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, nested block support, and smooth transitions.
+Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, admin-to-preview sync, and smooth transitions.
 
 ![Preview Hover Highlighting](./assets/demo.gif)
-
-**Phase 1** (current): Preview Hover Highlighting
-**Phase 2** (planned): Click in Preview → Focus block in Admin
-**Phase 3** (planned): Admin → Preview bidirectional sync
 
 ## Features
 
@@ -17,6 +13,7 @@ Better live preview for [Payload CMS](https://payloadcms.com) — hover highligh
 - **Named Blocks** — Label includes block name: `#3 Headline "My Title"`
 - **Nested Blocks** — Parent gets a dashed overlay, label shows breadcrumb: `#2 Columns › #1 Text`
 - **Scroll/Resize tracking** — Overlay follows position smoothly
+- **Admin → Preview sync** — Click a block row in the admin editor, preview scrolls to it with a flash highlight
 - **Draft-only** — Zero impact on published pages
 
 ## Installation

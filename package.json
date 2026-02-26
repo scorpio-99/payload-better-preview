@@ -1,6 +1,6 @@
 {
   "name": "payload-better-preview",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Better live preview for Payload CMS — hover highlighting with block identification and nested block support",
   "license": "MIT",
   "author": "scorpio-99",
