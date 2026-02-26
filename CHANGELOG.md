@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org).
 
+## [0.3.1] 2026-02-26
+### Changed
+- Flattened `src/` structure: removed `components/`, `exports/`, `shared/` subdirectories
+- Extracted shared constants (`COLORS`, `FLASH_DURATION`, attribute names) into `constants.ts`
+- Extracted DOM helper functions (`createOverlay`, `createLabel`, `positionOverlay`, etc.) into `overlay.ts`
+- Replaced hardcoded color values in `AdminBlockSyncProvider` with shared `COLORS` constants
+- Removed unused refs (`overlayRef`, `parentOverlayRef`, `labelRef`) from `PreviewToolbar`
+
 ## [0.3.0] 2026-02-26
 ### Added
 - Preview → Admin sync: clicking a block in the preview scrolls the admin editor to the corresponding block row

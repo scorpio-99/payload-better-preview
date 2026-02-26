@@ -1,7 +1,5 @@
 # payload-better-preview
 
-> **v0.3.0** — Bi-directional sync: click blocks in admin to scroll preview, click blocks in preview to scroll admin.
-
 Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, bi-directional admin/preview sync, and smooth transitions.
 
 ## Features
