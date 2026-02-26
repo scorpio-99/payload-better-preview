@@ -1,11 +1,9 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import type { ScrollToBlockMessage } from '../shared/messages'
-import { MESSAGE_PREFIX, isFocusBlockMessage } from '../shared/messages'
-
-const ROW_ID_PREFIX = 'layout-row-'
-const FLASH_DURATION = 1500
+import { COLORS, FLASH_DURATION, ROW_ID_PREFIX } from './constants'
+import type { ScrollToBlockMessage } from './messages'
+import { MESSAGE_PREFIX, isFocusBlockMessage } from './messages'
 
 function getPreviewIframe(): HTMLIFrameElement | null {
   return document.querySelector<HTMLIFrameElement>(
@@ -42,8 +40,8 @@ function flashHighlightRow(row: Element): void {
 
   Object.assign(el.style, {
     transition: `box-shadow ${FLASH_DURATION / 2}ms ease, background-color ${FLASH_DURATION / 2}ms ease`,
-    boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.8)',
-    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+    boxShadow: `0 0 0 2px ${COLORS.border}`,
+    backgroundColor: COLORS.bg,
     borderRadius: '4px',
   })
 
