@@ -15,3 +15,19 @@ export function isScrollToBlockMessage(data: unknown): data is ScrollToBlockMess
     typeof (data as ScrollToBlockMessage).index === 'number'
   )
 }
+
+export type FocusBlockMessage = {
+  type: `${typeof MESSAGE_PREFIX}focus-block`
+  index: number
+}
+
+export function isFocusBlockMessage(data: unknown): data is FocusBlockMessage {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'type' in data &&
+    (data as FocusBlockMessage).type === `${MESSAGE_PREFIX}focus-block` &&
+    'index' in data &&
+    typeof (data as FocusBlockMessage).index === 'number'
+  )
+}

@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
-import { isScrollToBlockMessage } from '../shared/messages'
+import { useEffect, useRef } from 'react'
+import { isScrollToBlockMessage, MESSAGE_PREFIX } from '../shared/messages'
+import type { FocusBlockMessage } from '../shared/messages'
 
 const ATTR = 'data-block'
 const ATTR_INDEX = 'data-block-index'
@@ -145,6 +146,10 @@ export const PreviewToolbar: React.FC = () => {
     const parentOverlay = createOverlay(true)
     const label = createLabel()
 
+    const style = document.createElement('style')
+    style.textContent = `[${ATTR}] { cursor: pointer; }`
+    document.head.appendChild(style)
+
     document.body.appendChild(overlay)
     document.body.appendChild(parentOverlay)
     document.body.appendChild(label)
@@ -235,8 +240,29 @@ export const PreviewToolbar: React.FC = () => {
       setTimeout(() => flashHighlight(block), 400)
     }
 
+    function handleClick(e: MouseEvent) {
+      const target = e.target as Element | null
+      if (!target) return
+
+      const block = target.closest(`[${ATTR}]`)
+      if (!block) return
+
+      const indexStr = block.getAttribute(ATTR_INDEX)
+      if (indexStr == null) return
+
+      const index = Number(indexStr)
+      if (Number.isNaN(index)) return
+
+      const message: FocusBlockMessage = {
+        type: `${MESSAGE_PREFIX}focus-block`,
+        index,
+      }
+      window.parent.postMessage(message, '*')
+    }
+
     document.addEventListener('mouseover', handleMouseOver)
     document.addEventListener('mouseout', handleMouseOut)
+    document.addEventListener('click', handleClick)
     window.addEventListener('scroll', handleScrollResize, { passive: true })
     window.addEventListener('resize', handleScrollResize, { passive: true })
     window.addEventListener('message', handleMessage)
@@ -244,10 +270,12 @@ export const PreviewToolbar: React.FC = () => {
     return () => {
       document.removeEventListener('mouseover', handleMouseOver)
       document.removeEventListener('mouseout', handleMouseOut)
+      document.removeEventListener('click', handleClick)
       window.removeEventListener('scroll', handleScrollResize)
       window.removeEventListener('resize', handleScrollResize)
       window.removeEventListener('message', handleMessage)
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      style.remove()
       overlay.remove()
       parentOverlay.remove()
       label.remove()
