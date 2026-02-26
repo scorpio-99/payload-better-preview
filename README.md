@@ -2,20 +2,32 @@
 
 > **v0.3.0** — Bi-directional sync: click blocks in admin to scroll preview, click blocks in preview to scroll admin.
 
-Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, admin-to-preview sync, and smooth transitions.
-
-![Preview Hover Highlighting](./assets/demo.gif)
+Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, bi-directional admin/preview sync, and smooth transitions.
 
 ## Features
 
-- **Hover Highlighting** — Blue overlay marks the block under the cursor
-- **Block Label** — Badge shows `#N BlockType`, e.g. `#3 Headline`
-- **Named Blocks** — Label includes block name: `#3 Headline "My Title"`
-- **Nested Blocks** — Parent gets a dashed overlay, label shows breadcrumb: `#2 Columns › #1 Text`
-- **Scroll/Resize tracking** — Overlay follows position smoothly
-- **Admin → Preview sync** — Click a block row in the admin editor, preview scrolls to it with a flash highlight
-- **Preview → Admin sync** — Click a block in the preview, admin scrolls to the block row, expands if collapsed, and highlights it
+### Hover Highlighting
+
+Blue overlay marks the block under the cursor with a label badge showing block type, index, and name. Nested blocks get a dashed parent overlay with breadcrumb labels.
+
+![Hover Highlighting](./assets/hover-highlighting.gif)
+
+### Admin → Preview Sync
+
+Click a block row in the admin editor — the preview scrolls to that block and highlights it with a flash effect.
+
+![Admin to Preview Sync](./assets/admin-to-preview.gif)
+
+### Preview → Admin Sync
+
+Click a block in the preview — the admin editor scrolls to the corresponding block row, expands it if collapsed, and highlights it.
+
+![Preview to Admin Sync](./assets/preview-to-admin.gif)
+
+### Other
+
 - **Draft-only** — Zero impact on published pages
+- **Scroll/Resize tracking** — Overlay follows block position smoothly
 
 ## Installation
 
