@@ -1,6 +1,6 @@
 # payload-better-preview
 
-> **v0.2.0** — Phase 1 (hover highlighting) and Phase 3 (admin → preview sync) are stable. Phase 2 is planned.
+> **v0.3.0** — Bi-directional sync: click blocks in admin to scroll preview, click blocks in preview to scroll admin.
 
 Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, admin-to-preview sync, and smooth transitions.
 
@@ -14,6 +14,7 @@ Better live preview for [Payload CMS](https://payloadcms.com) — hover highligh
 - **Nested Blocks** — Parent gets a dashed overlay, label shows breadcrumb: `#2 Columns › #1 Text`
 - **Scroll/Resize tracking** — Overlay follows position smoothly
 - **Admin → Preview sync** — Click a block row in the admin editor, preview scrolls to it with a flash highlight
+- **Preview → Admin sync** — Click a block in the preview, admin scrolls to the block row, expands if collapsed, and highlights it
 - **Draft-only** — Zero impact on published pages
 
 ## Installation
