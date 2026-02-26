@@ -141,7 +141,9 @@ export const PreviewToolbar: React.FC = () => {
   const rafRef = useRef<number>(0)
 
   useEffect(() => {
-    // Create DOM elements
+    // Only activate inside an iframe (draft mode + iframe = admin live preview)
+    if (window.self === window.top) return
+
     const overlay = createOverlay()
     const parentOverlay = createOverlay(true)
     const label = createLabel()
@@ -173,11 +175,9 @@ export const PreviewToolbar: React.FC = () => {
       positionOverlay(overlay, rect)
       positionLabel(label, rect)
 
-      // Check for parent block
       const parent = block.parentElement?.closest(`[${ATTR}]`)
       if (parent) {
-        const parentRect = parent.getBoundingClientRect()
-        positionOverlay(parentOverlay, parentRect)
+        positionOverlay(parentOverlay, parent.getBoundingClientRect())
       }
     }
 
@@ -191,26 +191,18 @@ export const PreviewToolbar: React.FC = () => {
         return
       }
 
-      // Skip if same block
       if (block === currentBlockRef.current) return
 
       currentBlockRef.current = block
       const rect = block.getBoundingClientRect()
-
-      // Check for parent block (nested blocks like columns)
       const parent = block.parentElement?.closest(`[${ATTR}]`)
 
-      // Position primary overlay
       positionOverlay(overlay, rect)
-
-      // Build and position label
       label.textContent = buildLabel(block, parent)
       positionLabel(label, rect)
 
-      // Handle parent overlay
       if (parent) {
-        const parentRect = parent.getBoundingClientRect()
-        positionOverlay(parentOverlay, parentRect)
+        positionOverlay(parentOverlay, parent.getBoundingClientRect())
       } else {
         hideEl(parentOverlay)
       }
@@ -234,9 +226,21 @@ export const PreviewToolbar: React.FC = () => {
       const block = document.querySelector(`[${ATTR_INDEX}="${e.data.index}"]`)
       if (!block) return
 
-      block.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      currentBlockRef.current = block
+      const rect = block.getBoundingClientRect()
+      const parent = block.parentElement?.closest(`[${ATTR}]`)
 
-      // Wait for scroll to settle, then flash
+      positionOverlay(overlay, rect)
+      label.textContent = buildLabel(block, parent)
+      positionLabel(label, rect)
+
+      if (parent) {
+        positionOverlay(parentOverlay, parent.getBoundingClientRect())
+      } else {
+        hideEl(parentOverlay)
+      }
+
+      block.scrollIntoView({ behavior: 'smooth', block: 'center' })
       setTimeout(() => flashHighlight(block), 400)
     }
 

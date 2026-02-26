@@ -87,7 +87,7 @@ export const AdminBlockSyncProvider: React.FC<{ children: React.ReactNode }> = (
 
       expandIfCollapsed(row)
       row.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      setTimeout(() => flashHighlightRow(row), 400)
+      flashHighlightRow(row)
     }
 
     document.addEventListener('click', handleClick)
