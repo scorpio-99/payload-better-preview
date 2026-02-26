@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
+import { isScrollToBlockMessage } from '../shared/messages'
 
 const ATTR = 'data-block'
 const ATTR_INDEX = 'data-block-index'
@@ -12,7 +13,10 @@ const COLORS = {
   label: 'rgba(59, 130, 246, 0.9)',
   parentBorder: 'rgba(59, 130, 246, 0.4)',
   parentBg: 'rgba(59, 130, 246, 0.02)',
+  flash: 'rgba(59, 130, 246, 0.25)',
 }
+
+const FLASH_DURATION = 1500
 
 function createOverlay(dashed = false): HTMLDivElement {
   const el = document.createElement('div')
@@ -96,6 +100,36 @@ function buildLabel(block: Element, parent?: Element | null): string {
   }
 
   return `${indexStr} ${typeStr}${nameStr}`.trim()
+}
+
+function flashHighlight(el: Element) {
+  const rect = el.getBoundingClientRect()
+  const flash = document.createElement('div')
+  Object.assign(flash.style, {
+    position: 'absolute',
+    top: `${rect.top + window.scrollY}px`,
+    left: `${rect.left + window.scrollX}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    background: COLORS.flash,
+    border: `2px solid ${COLORS.border}`,
+    borderRadius: '4px',
+    pointerEvents: 'none',
+    zIndex: '9999',
+    transition: `opacity ${FLASH_DURATION / 2}ms ease`,
+    opacity: '1',
+  })
+  document.body.appendChild(flash)
+
+  // Start fade-out after half the duration
+  setTimeout(() => {
+    flash.style.opacity = '0'
+  }, FLASH_DURATION / 2)
+
+  // Remove element after full duration
+  setTimeout(() => {
+    flash.remove()
+  }, FLASH_DURATION)
 }
 
 export const PreviewToolbar: React.FC = () => {
@@ -189,16 +223,30 @@ export const PreviewToolbar: React.FC = () => {
       rafRef.current = requestAnimationFrame(updatePosition)
     }
 
+    function handleMessage(e: MessageEvent) {
+      if (!isScrollToBlockMessage(e.data)) return
+
+      const block = document.querySelector(`[${ATTR_INDEX}="${e.data.index}"]`)
+      if (!block) return
+
+      block.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+      // Wait for scroll to settle, then flash
+      setTimeout(() => flashHighlight(block), 400)
+    }
+
     document.addEventListener('mouseover', handleMouseOver)
     document.addEventListener('mouseout', handleMouseOut)
     window.addEventListener('scroll', handleScrollResize, { passive: true })
     window.addEventListener('resize', handleScrollResize, { passive: true })
+    window.addEventListener('message', handleMessage)
 
     return () => {
       document.removeEventListener('mouseover', handleMouseOver)
       document.removeEventListener('mouseout', handleMouseOut)
       window.removeEventListener('scroll', handleScrollResize)
       window.removeEventListener('resize', handleScrollResize)
+      window.removeEventListener('message', handleMessage)
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
       overlay.remove()
       parentOverlay.remove()
