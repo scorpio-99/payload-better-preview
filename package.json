@@ -1,8 +1,21 @@
 {
   "name": "payload-better-preview",
-  "version": "1.0.0",
-  "description": "Better live preview for Payload CMS — hover highlighting, click-to-focus, and bidirectional sync",
+  "version": "0.1.0",
+  "description": "Better live preview for Payload CMS — hover highlighting with block identification and nested block support",
   "license": "MIT",
+  "author": "scorpio-99",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scorpio-99/payload-better-preview"
+  },
+  "keywords": [
+    "payload",
+    "payloadcms",
+    "payload-plugin",
+    "live-preview",
+    "preview",
+    "cms"
+  ],
   "type": "module",
   "exports": {
     ".": {
@@ -104,6 +117,5 @@
       "unrs-resolver"
     ]
   },
-  "registry": "https://registry.npmjs.org/",
-  "dependencies": {}
+  "registry": "https://registry.npmjs.org/"
 }

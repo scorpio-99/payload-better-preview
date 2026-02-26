@@ -1,6 +1,6 @@
 # payload-better-preview
 
-> **Work in progress** — This plugin is still in early development and not ready for production use.
+> **v0.1.0** — Phase 1 (hover highlighting) is stable. Phases 2–3 are planned but not yet implemented.
 
 Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, nested block support, and smooth transitions.
 
