@@ -70,12 +70,12 @@ Example:
 </div>
 ```
 
-### 3. Render `<PreviewToolbar />` in your page
+### 3. Render `<BetterPreview />` in your page
 
 Import the client component and render it conditionally in draft mode:
 
 ```tsx
-import { PreviewToolbar } from 'payload-better-preview/client'
+import { BetterPreview } from 'payload-better-preview/client'
 
 export default async function Page() {
   const { isEnabled: draft } = await draftMode()
@@ -83,7 +83,7 @@ export default async function Page() {
   return (
     <>
       {draft && <LivePreviewListener />}
-      {draft && <PreviewToolbar />}
+      {draft && <BetterPreview />}
       {/* ... rest of page */}
     </>
   )
@@ -100,7 +100,7 @@ betterPreview({
 
 ## How it works
 
-`<PreviewToolbar />` is a `'use client'` component that renders `null` (no React DOM output). It injects 3 absolutely-positioned DOM elements into `document.body`:
+`<BetterPreview />` is a `'use client'` component that renders `null` (no React DOM output). It injects 3 absolutely-positioned DOM elements into `document.body`:
 
 1. **Overlay** — Primary block highlight (solid blue border)
 2. **Parent Overlay** — For nested blocks (dashed border, subtle)

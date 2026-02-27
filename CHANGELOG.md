@@ -5,9 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org).
 
+## [1.0.0] 2026-02-27
+### Changed
+- **BREAKING**: Renamed `PreviewToolbar` to `BetterPreview` — update imports to `import { BetterPreview } from 'payload-better-preview/client'`
+### Fixed
+- Added `.d.ts` type declarations to published package
+
 ## [0.3.2] 2026-02-27
 ### Changed
-- prepared npm publish
+- Prepared npm publish
 
 ## [0.3.1] 2026-02-26
 ### Changed
