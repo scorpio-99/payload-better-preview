@@ -30,9 +30,9 @@ Click a block in the preview — the admin editor scrolls to the corresponding b
 ## Installation
 
 ```bash
-pnpm add github:scorpio-99/payload-better-preview
+pnpm add payload-better-preview
 # or
-npm install github:scorpio-99/payload-better-preview
+npm install payload-better-preview
 ```
 
 ### 1. Register the plugin
