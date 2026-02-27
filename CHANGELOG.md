@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org).
 
+## [1.0.1] 2026-02-27
+### Fixed
+- Fixed `exports` in package.json pointing to `src/` instead of `dist/`, causing "Module not found" errors when installed from npm
+
 ## [1.0.0] 2026-02-27
 ### Changed
 - **BREAKING**: Renamed `PreviewToolbar` to `BetterPreview` — update imports to `import { BetterPreview } from 'payload-better-preview/client'`
