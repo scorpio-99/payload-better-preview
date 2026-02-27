@@ -1,2 +1,2 @@
-export { PreviewToolbar } from './PreviewToolbar'
+export { BetterPreview } from './BetterPreview'
 export { AdminBlockSyncProvider } from './AdminBlockSyncProvider'

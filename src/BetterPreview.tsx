@@ -14,7 +14,7 @@ import {
   flashHighlight,
 } from './overlay'
 
-export const PreviewToolbar: React.FC = () => {
+export const BetterPreview: React.FC = () => {
   const currentBlockRef = useRef<Element | null>(null)
   const rafRef = useRef<number>(0)
 
