@@ -2,6 +2,7 @@ export const MESSAGE_PREFIX = 'better-preview:'
 
 export type ScrollToBlockMessage = {
   type: `${typeof MESSAGE_PREFIX}scroll-to-block`
+  field: string
   index: number
 }
 
@@ -11,6 +12,8 @@ export function isScrollToBlockMessage(data: unknown): data is ScrollToBlockMess
     data !== null &&
     'type' in data &&
     (data as ScrollToBlockMessage).type === `${MESSAGE_PREFIX}scroll-to-block` &&
+    'field' in data &&
+    typeof (data as ScrollToBlockMessage).field === 'string' &&
     'index' in data &&
     typeof (data as ScrollToBlockMessage).index === 'number'
   )
@@ -18,6 +21,7 @@ export function isScrollToBlockMessage(data: unknown): data is ScrollToBlockMess
 
 export type FocusBlockMessage = {
   type: `${typeof MESSAGE_PREFIX}focus-block`
+  field: string
   index: number
 }
 
@@ -27,6 +31,8 @@ export function isFocusBlockMessage(data: unknown): data is FocusBlockMessage {
     data !== null &&
     'type' in data &&
     (data as FocusBlockMessage).type === `${MESSAGE_PREFIX}focus-block` &&
+    'field' in data &&
+    typeof (data as FocusBlockMessage).field === 'string' &&
     'index' in data &&
     typeof (data as FocusBlockMessage).index === 'number'
   )

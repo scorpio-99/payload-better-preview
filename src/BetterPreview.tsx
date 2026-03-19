@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { ATTR, ATTR_INDEX } from './constants'
+import { useEffect, useRef, useState } from 'react'
+import { ATTR, ATTR_INDEX, ATTR_FIELD, DEFAULT_ACCENT_COLOR, makeColors } from './constants'
 import { isScrollToBlockMessage, MESSAGE_PREFIX } from './messages'
 import type { FocusBlockMessage } from './messages'
 import {
@@ -14,17 +14,38 @@ import {
   flashHighlight,
 } from './overlay'
 
-export const BetterPreview: React.FC = () => {
+
+export type ToggleProps = {
+  enabled: boolean
+  onToggle: () => void
+}
+
+type Props = {
+  accentColor?: string
+  showToggle?: boolean
+  scrollAlign?: 'start' | 'center' | 'end'
+  scrollOffset?: number
+  toggleComponent?: React.ComponentType<ToggleProps>
+}
+
+export const BetterPreview: React.FC<Props> = ({ accentColor, showToggle = true, scrollAlign = 'start', scrollOffset = 0, toggleComponent: ToggleComponent }) => {
+  const [isInsideIframe, setIsInsideIframe] = useState(false)
+  const [enabled, setEnabled] = useState(true)
   const currentBlockRef = useRef<Element | null>(null)
   const rafRef = useRef<number>(0)
 
   useEffect(() => {
-    // Only activate inside an iframe (draft mode + iframe = admin live preview)
-    if (window.self === window.top) return
+    setIsInsideIframe(window.self !== window.top)
+  }, [])
 
-    const overlay = createOverlay()
-    const parentOverlay = createOverlay(true)
-    const label = createLabel()
+  useEffect(() => {
+    if (!isInsideIframe || !enabled) return
+
+    const colors = makeColors(accentColor ?? DEFAULT_ACCENT_COLOR)
+
+    const overlay = createOverlay(false, colors)
+    const parentOverlay = createOverlay(true, colors)
+    const label = createLabel(colors)
 
     const style = document.createElement('style')
     style.textContent = `[${ATTR}] { cursor: pointer; }`
@@ -97,7 +118,9 @@ export const BetterPreview: React.FC = () => {
     function handleMessage(e: MessageEvent) {
       if (!isScrollToBlockMessage(e.data)) return
 
-      const block = document.querySelector(`[${ATTR_INDEX}="${e.data.index}"]`)
+      const block = document.querySelector(
+        `[${ATTR_FIELD}="${e.data.field}"][${ATTR_INDEX}="${e.data.index}"]`,
+      )
       if (!block) return
 
       currentBlockRef.current = block
@@ -114,8 +137,16 @@ export const BetterPreview: React.FC = () => {
         hideEl(parentOverlay)
       }
 
-      block.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      setTimeout(() => flashHighlight(block), 400)
+      let top: number
+      if (scrollAlign === 'center') {
+        top = rect.top + window.scrollY - window.innerHeight / 2 + rect.height / 2 - scrollOffset
+      } else if (scrollAlign === 'end') {
+        top = rect.top + window.scrollY - window.innerHeight + rect.height - scrollOffset
+      } else {
+        top = rect.top + window.scrollY - scrollOffset
+      }
+      window.scrollTo({ top, behavior: 'smooth' })
+      setTimeout(() => flashHighlight(block, colors), 400)
     }
 
     function handleClick(e: MouseEvent) {
@@ -131,8 +162,12 @@ export const BetterPreview: React.FC = () => {
       const index = Number(indexStr)
       if (Number.isNaN(index)) return
 
+      const field = block.getAttribute(ATTR_FIELD)
+      if (!field) return
+
       const message: FocusBlockMessage = {
         type: `${MESSAGE_PREFIX}focus-block`,
+        field,
         index,
       }
       window.parent.postMessage(message, '*')
@@ -157,8 +192,70 @@ export const BetterPreview: React.FC = () => {
       overlay.remove()
       parentOverlay.remove()
       label.remove()
+      currentBlockRef.current = null
     }
-  }, [])
+  }, [isInsideIframe, enabled, accentColor, scrollAlign, scrollOffset])
 
-  return null
+  if (!isInsideIframe || !showToggle) return null
+
+  if (ToggleComponent) {
+    return <ToggleComponent enabled={enabled} onToggle={() => setEnabled((v) => !v)} />
+  }
+
+  const accent = accentColor ?? DEFAULT_ACCENT_COLOR
+
+  return (
+    <button
+      onClick={() => setEnabled((v) => !v)}
+      title={enabled ? 'Disable block sync' : 'Enable block sync'}
+      style={{
+        position: 'fixed',
+        top: '16px',
+        right: '16px',
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '6px 12px 6px 8px',
+        borderRadius: '999px',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: '12px',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        fontWeight: 600,
+        lineHeight: 1,
+        color: enabled ? '#fff' : '#888',
+        background: enabled ? accent : 'rgba(0,0,0,0.08)',
+        boxShadow: enabled
+          ? `0 2px 8px color-mix(in srgb, ${accent} 40%, transparent)`
+          : '0 1px 4px rgba(0,0,0,0.12)',
+        transition: 'background 200ms ease, color 200ms ease, box-shadow 200ms ease',
+      }}
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {enabled ? (
+          <>
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </>
+        ) : (
+          <>
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+            <line x1="1" y1="1" x2="23" y2="23" />
+          </>
+        )}
+      </svg>
+      {enabled ? 'Block sync' : 'Block sync'}
+    </button>
+  )
 }

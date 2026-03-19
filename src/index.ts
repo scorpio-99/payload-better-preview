@@ -14,9 +14,14 @@ export const betterPreview =
     config.admin = config.admin || {}
     config.admin.components = config.admin.components || {}
     config.admin.components.providers = config.admin.components.providers || []
-    config.admin.components.providers.push(
-      'payload-better-preview/client#AdminBlockSyncProvider',
-    )
+    config.admin.components.providers.push({
+      path: 'payload-better-preview/client#AdminBlockSyncProvider',
+      clientProps: {
+        accentColor: pluginOptions?.accentColor,
+        scrollAlign: pluginOptions?.scrollAlign,
+        scrollOffset: pluginOptions?.scrollOffset,
+      },
+    })
 
     return config
   }

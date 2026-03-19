@@ -1,27 +1,29 @@
-import { ATTR, ATTR_INDEX, ATTR_NAME, COLORS, FLASH_DURATION } from './constants'
+import { ATTR, ATTR_INDEX, ATTR_NAME, FLASH_DURATION } from './constants'
 
-export function createOverlay(dashed = false): HTMLDivElement {
+type Colors = ReturnType<typeof import('./constants').makeColors>
+
+export function createOverlay(dashed: boolean, colors: Colors): HTMLDivElement {
   const el = document.createElement('div')
   Object.assign(el.style, {
     position: 'absolute',
     pointerEvents: 'none',
     zIndex: dashed ? '9998' : '9999',
-    border: dashed ? `2px dashed ${COLORS.parentBorder}` : `2px solid ${COLORS.border}`,
+    border: dashed ? `2px dashed ${colors.parentBorder}` : `2px solid ${colors.border}`,
     borderRadius: '4px',
-    background: dashed ? COLORS.parentBg : COLORS.bg,
+    background: dashed ? colors.parentBg : colors.bg,
     opacity: '0',
     transition: 'opacity 150ms ease, top 150ms ease, left 150ms ease, width 150ms ease, height 150ms ease',
   })
   return el
 }
 
-export function createLabel(): HTMLDivElement {
+export function createLabel(colors: Colors): HTMLDivElement {
   const el = document.createElement('div')
   Object.assign(el.style, {
     position: 'absolute',
     pointerEvents: 'none',
     zIndex: '10000',
-    background: COLORS.label,
+    background: colors.label,
     color: '#fff',
     fontSize: '12px',
     fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -62,7 +64,6 @@ export function buildLabel(block: Element, parent?: Element | null): string {
   const index = block.getAttribute(ATTR_INDEX)
   const name = block.getAttribute(ATTR_NAME)
 
-  // 1-based display index
   const indexStr = index != null ? `#${Number(index) + 1}` : ''
   const typeStr = type.charAt(0).toUpperCase() + type.slice(1)
   const nameStr = name ? ` "${name}"` : ''
@@ -78,7 +79,7 @@ export function buildLabel(block: Element, parent?: Element | null): string {
   return `${indexStr} ${typeStr}${nameStr}`.trim()
 }
 
-export function flashHighlight(el: Element) {
+export function flashHighlight(el: Element, colors: Colors) {
   const rect = el.getBoundingClientRect()
   const flash = document.createElement('div')
   Object.assign(flash.style, {
@@ -87,8 +88,8 @@ export function flashHighlight(el: Element) {
     left: `${rect.left + window.scrollX}px`,
     width: `${rect.width}px`,
     height: `${rect.height}px`,
-    background: COLORS.flash,
-    border: `2px solid ${COLORS.border}`,
+    background: colors.flash,
+    border: `2px solid ${colors.border}`,
     borderRadius: '4px',
     pointerEvents: 'none',
     zIndex: '9999',

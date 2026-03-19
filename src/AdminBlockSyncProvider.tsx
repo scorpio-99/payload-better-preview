@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { COLORS, FLASH_DURATION, ROW_ID_PREFIX } from './constants'
+import { DEFAULT_ACCENT_COLOR, FLASH_DURATION, makeColors } from './constants'
 import type { ScrollToBlockMessage } from './messages'
 import { MESSAGE_PREFIX, isFocusBlockMessage } from './messages'
 
@@ -11,15 +11,16 @@ function getPreviewIframe(): HTMLIFrameElement | null {
   )
 }
 
-function extractBlockIndex(el: Element): number | null {
-  const row = el.closest(`[id^="${ROW_ID_PREFIX}"]`)
+function extractBlockLocation(el: Element): { field: string; index: number } | null {
+  const row = el.closest('[id*="-row-"]')
   if (!row) return null
-  const index = Number(row.id.slice(ROW_ID_PREFIX.length))
-  return Number.isNaN(index) ? null : index
+  const match = row.id.match(/^(.+)-row-(\d+)$/)
+  if (!match) return null
+  return { field: match[1], index: Number(match[2]) }
 }
 
-function findBlockRow(index: number): Element | null {
-  return document.querySelector(`[id$="-row-${index}"]`)
+function findBlockRow(field: string, index: number): Element | null {
+  return document.querySelector(`[id="${field}-row-${index}"]`)
 }
 
 function expandIfCollapsed(row: Element): void {
@@ -29,7 +30,30 @@ function expandIfCollapsed(row: Element): void {
   toggle?.click()
 }
 
-function flashHighlightRow(row: Element): void {
+function scrollToElement(el: Element, align: ScrollLogicalPosition, offset: number) {
+  const htmlEl = el as HTMLElement
+  const prev = htmlEl.style.scrollMarginTop
+  htmlEl.style.scrollMarginTop = `${offset}px`
+  el.scrollIntoView({ behavior: 'smooth', block: align })
+  setTimeout(() => {
+    htmlEl.style.scrollMarginTop = prev
+  }, 1000)
+}
+
+// Parses field path to get ancestor row IDs from outermost to innermost.
+// e.g. "content-0-content-1-sidebar" → ["content-row-0", "content-0-content-row-1"]
+function getAncestorRowIds(field: string): string[] {
+  const ancestors: string[] = []
+  const regex = /-(\d+)-/g
+  let match
+  while ((match = regex.exec(field)) !== null) {
+    const prefix = field.slice(0, match.index)
+    ancestors.push(`${prefix}-row-${match[1]}`)
+  }
+  return ancestors
+}
+
+function flashHighlightRow(row: Element, colors: ReturnType<typeof makeColors>): void {
   const el = row as HTMLElement
   const prev = {
     transition: el.style.transition,
@@ -40,8 +64,8 @@ function flashHighlightRow(row: Element): void {
 
   Object.assign(el.style, {
     transition: `box-shadow ${FLASH_DURATION / 2}ms ease, background-color ${FLASH_DURATION / 2}ms ease`,
-    boxShadow: `0 0 0 2px ${COLORS.border}`,
-    backgroundColor: COLORS.bg,
+    boxShadow: `0 0 0 2px ${colors.border}`,
+    backgroundColor: colors.bg,
     borderRadius: '4px',
   })
 
@@ -57,21 +81,32 @@ function flashHighlightRow(row: Element): void {
   }, FLASH_DURATION)
 }
 
-export const AdminBlockSyncProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+type Props = {
+  children: React.ReactNode
+  accentColor?: string
+  scrollAlign?: 'start' | 'center' | 'end'
+  scrollOffset?: number
+}
+
+export const AdminBlockSyncProvider: React.FC<Props> = ({ children, accentColor, scrollAlign = 'start', scrollOffset = 128 }) => {
   useEffect(() => {
+    const colors = makeColors(accentColor ?? DEFAULT_ACCENT_COLOR)
     function handleClick(e: MouseEvent) {
       const target = e.target as Element | null
       if (!target) return
 
-      const index = extractBlockIndex(target)
-      if (index === null) return
+      if ((target as Element).closest('.collapsible__toggle')) return
+
+      const location = extractBlockLocation(target)
+      if (!location) return
 
       const iframe = getPreviewIframe()
       if (!iframe?.contentWindow) return
 
       const message: ScrollToBlockMessage = {
         type: `${MESSAGE_PREFIX}scroll-to-block`,
-        index,
+        field: location.field,
+        index: location.index,
       }
 
       iframe.contentWindow.postMessage(message, '*')
@@ -80,12 +115,30 @@ export const AdminBlockSyncProvider: React.FC<{ children: React.ReactNode }> = (
     function handleMessage(e: MessageEvent) {
       if (!isFocusBlockMessage(e.data)) return
 
-      const row = findBlockRow(e.data.index)
-      if (!row) return
+      const iframe = getPreviewIframe()
+      if (!iframe?.contentWindow || e.source !== iframe.contentWindow) return
 
-      expandIfCollapsed(row)
-      row.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      flashHighlightRow(row)
+      const { field, index } = e.data
+      const ancestorIds = getAncestorRowIds(field)
+
+      ancestorIds.forEach((id) => {
+        const ancestor = document.querySelector(`[id="${id}"]`)
+        if (ancestor) expandIfCollapsed(ancestor)
+      })
+
+      const ancestorDelay = ancestorIds.length > 0 ? 350 : 0
+      setTimeout(() => {
+        const row = findBlockRow(field, index)
+        if (!row) return
+
+        const wasCollapsed = !!row.querySelector('.collapsible--collapsed')
+        expandIfCollapsed(row)
+
+        setTimeout(() => {
+          scrollToElement(row, scrollAlign, scrollOffset)
+          flashHighlightRow(row, colors)
+        }, wasCollapsed ? 350 : 0)
+      }, ancestorDelay)
     }
 
     document.addEventListener('click', handleClick)
@@ -94,7 +147,7 @@ export const AdminBlockSyncProvider: React.FC<{ children: React.ReactNode }> = (
       document.removeEventListener('click', handleClick)
       window.removeEventListener('message', handleMessage)
     }
-  }, [])
+  }, [accentColor, scrollAlign, scrollOffset])
 
   return <>{children}</>
 }
