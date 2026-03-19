@@ -119,7 +119,6 @@ export default async function Page() {
 }
 ```
 
-`LivePreviewListener` is a Payload built-in component that handles live content re-fetching when the admin updates data. `BetterPreview` adds the block sync layer on top of that.
 
 ## Nested blocks
 
@@ -191,7 +190,6 @@ function MyToggle({ enabled, onToggle }: ToggleProps) {
 - **Admin → Preview**: clicking anywhere inside a block row in the admin sends a `scroll-to-block` message to the preview iframe. The preview scrolls to the matching `[data-block-field][data-block-index]` element and shows a highlight overlay.
 - **Preview → Admin**: clicking a block in the preview sends a `focus-block` message to the admin. The admin expands all ancestor rows (for nested blocks), then scrolls to and highlights the target block row.
 - All communication is via `window.postMessage`. No network requests, no shared state.
-- `<BetterPreview />` activates only when rendered inside an iframe (`window.self !== window.top`), so it has zero impact on published pages.
 
 `<BetterPreview />` is a `'use client'` component that renders `null` (no React DOM output). It injects 3 absolutely-positioned DOM elements into `document.body`:
 
