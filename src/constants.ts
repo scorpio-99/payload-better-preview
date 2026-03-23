@@ -1,16 +1,20 @@
 export const ATTR = 'data-block'
 export const ATTR_INDEX = 'data-block-index'
 export const ATTR_NAME = 'data-block-name'
+export const ATTR_FIELD = 'data-block-field'
 
-export const COLORS = {
-  border: 'rgba(59, 130, 246, 0.8)',
-  bg: 'rgba(59, 130, 246, 0.05)',
-  label: 'rgba(59, 130, 246, 0.9)',
-  parentBorder: 'rgba(59, 130, 246, 0.4)',
-  parentBg: 'rgba(59, 130, 246, 0.02)',
-  flash: 'rgba(59, 130, 246, 0.25)',
+export const DEFAULT_ACCENT_COLOR = '#3b82f6'
+
+export function makeColors(accent: string) {
+  const c = (pct: number) => `color-mix(in srgb, ${accent} ${pct}%, transparent)`
+  return {
+    border: c(80),
+    bg: c(5),
+    label: accent,
+    parentBorder: c(40),
+    parentBg: c(2),
+    flash: c(25),
+  }
 }
 
 export const FLASH_DURATION = 1500
-
-export const ROW_ID_PREFIX = 'layout-row-'
