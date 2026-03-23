@@ -198,3 +198,8 @@ function MyToggle({ enabled, onToggle }: ToggleProps) {
 3. **Label** — Info badge with block type and index
 
 All interaction is handled via event delegation on `document`, so it survives DOM updates from live preview re-renders.
+
+## Contributors
+<a href="https://github.com/scorpio-99/payload-better-preview/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=scorpio-99/payload-better-preview" />
+</a>
