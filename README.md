@@ -142,6 +142,129 @@ export function NestedBlockRenderer({ block, index, field }) {
 }
 ```
 
+## RichText (Lexical) blocks
+
+Payload's Lexical editor supports blocks embedded directly inside richText fields. The plugin provides full bi-directional sync for these blocks too.
+
+### 1. Register the Lexical feature
+
+Add `BetterPreviewLexicalFeature` to your Lexical editor config. This injects a client-side plugin that stamps each block in the editor with a `data-block-id` attribute so the admin can locate them:
+
+```ts
+// payload.config.ts
+import { betterPreview, BetterPreviewLexicalFeature } from 'payload-better-preview'
+import { lexicalEditor, BlocksFeature } from '@payloadcms/richtext-lexical'
+
+export default buildConfig({
+  plugins: [betterPreview()],
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      BlocksFeature({ blocks: [...] }),
+      BetterPreviewLexicalFeature(),
+    ],
+  }),
+})
+```
+
+### 2. Add data attributes in JSX converters
+
+Add `data-block-id` (the block's unique ID from `node.fields.id`) to each block wrapper. The plugin uses this ID to sync between admin and preview:
+
+```tsx
+// jsxConverters.tsx
+import { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
+
+export const jsxConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
+  ...defaultConverters,
+  blocks: {
+    hero: ({ node }) => (
+      <div
+        data-block={node.fields.blockType}
+        data-block-id={node.fields.id}         // required for richText sync
+      >
+        {/* block content */}
+      </div>
+    ),
+  },
+})
+```
+
+### How it works
+
+- **`data-block-id`** identifies each block uniquely across both admin and preview
+- **Admin → Preview**: clicking a Lexical block in the admin sends `scroll-to-richtext-block` with the block ID — the preview finds `[data-block-id]` and scrolls to it
+- **Preview → Admin**: clicking a block with `data-block-id` (but no `data-block-field`) sends `focus-richtext-block` — the admin finds `[data-block-id]`, expands the collapsible if needed, and scrolls to it
+
+### Disabling sync on specific elements
+
+Add `data-preview-ignore` to any element to prevent clicks on it from triggering scroll sync. Works in both directions — in the preview (blocks rendered on the frontend) and in the admin (custom block components inside the Lexical editor).
+
+Useful for interactive elements like buttons, links, or custom controls inside a block component:
+
+```tsx
+// jsxConverters.tsx — preview side
+blocks: {
+  cta: ({ node }) => (
+    <div
+      data-block={node.fields.blockType}
+      data-block-id={node.fields.id}
+    >
+      <h2>{node.fields.title}</h2>
+      {/* clicks here will NOT trigger scroll sync */}
+      <button data-preview-ignore onClick={...}>
+        Buy now
+      </button>
+    </div>
+  ),
+},
+```
+
+```tsx
+// Custom block component — admin side (Lexical editor)
+export function CtaBlockComponent({ formData }) {
+  return (
+    <div>
+      <p>{formData.title}</p>
+      {/* clicks here will NOT send scroll-to-preview message */}
+      <button data-preview-ignore onClick={openModal}>
+        Edit link
+      </button>
+    </div>
+  )
+}
+```
+
+Any click originating inside a `[data-preview-ignore]` element is ignored by the plugin entirely — hover highlighting and scroll sync are both skipped for that interaction.
+
+### Nested blocks inside richText
+
+For blocks that are nested inside a richText block (e.g. a `nestedBlock` with its own `blocks` field), sync works the same as regular nested blocks. The plugin automatically detects the parent richText block and scopes the search to avoid duplicate IDs.
+
+Add `data-block-field` and `data-block-index` to nested blocks (but NOT to direct richText blocks since they have no field path):
+
+```tsx
+// For the outer richText block (nestedBlock):
+<div
+  data-block={node.fields.blockType}
+  data-block-id={node.fields.id}
+>
+  <RenderBlocks
+    blocks={node.fields.content}
+    field="content"               // local field name only (not full path)
+    richTextBlockId={node.fields.id}
+  />
+</div>
+
+// For inner blocks (BlockRenderer receives richTextBlockId from parent):
+<div
+  data-block={block.blockType}
+  data-block-id={block.id}
+  data-block-index={index}
+  data-block-field={field}        // e.g. "content"
+>
+```
+
 ## Plugin options
 
 | Option | Type | Default | Description |
@@ -187,9 +310,16 @@ function MyToggle({ enabled, onToggle }: ToggleProps) {
 
 ## How it works
 
-- **Admin → Preview**: clicking anywhere inside a block row in the admin sends a `scroll-to-block` message to the preview iframe. The preview scrolls to the matching `[data-block-field][data-block-index]` element and shows a highlight overlay.
-- **Preview → Admin**: clicking a block in the preview sends a `focus-block` message to the admin. The admin expands all ancestor rows (for nested blocks), then scrolls to and highlights the target block row.
-- All communication is via `window.postMessage`. No network requests, no shared state.
+**Block fields (standard):**
+- **Admin → Preview**: clicking a block row in the admin sends `scroll-to-block` with `{ field, index }` to the preview iframe. The preview finds `[data-block-field][data-block-index]` and scrolls to it.
+- **Preview → Admin**: clicking a block with `data-block-field` sends `focus-block`. The admin expands all ancestor rows and scrolls to the target row.
+
+**RichText (Lexical) blocks:**
+- **Admin → Preview**: clicking a Lexical block sends `scroll-to-richtext-block` with `{ blockId }`. The preview finds `[data-block-id]` and scrolls to it.
+- **Preview → Admin**: clicking a block with `data-block-id` (but no `data-block-field`) sends `focus-richtext-block`. The admin finds `[data-block-id]`, expands the collapsible if needed, and scrolls to it.
+- **Nested blocks inside richText**: clicking sends `focus-block` with an extra `richTextBlockId`. The admin opens the parent Lexical block, then scopes the row search within it — avoiding duplicate ID issues when multiple identical blocks exist.
+
+All communication is via `window.postMessage`. No network requests, no shared state.
 
 `<BetterPreview />` is a `'use client'` component that renders `null` (no React DOM output). It injects 3 absolutely-positioned DOM elements into `document.body`:
 

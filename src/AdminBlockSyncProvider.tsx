@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { DEFAULT_ACCENT_COLOR, FLASH_DURATION, makeColors } from './constants'
-import type { ScrollToBlockMessage } from './messages'
-import { MESSAGE_PREFIX, isFocusBlockMessage } from './messages'
+import { DEFAULT_ACCENT_COLOR, ATTR_IGNORE, FLASH_DURATION, makeColors } from './constants'
+import type { ScrollToBlockMessage, ScrollToRichTextBlockMessage, ScrollToRichTextNestedBlockMessage } from './messages'
+import { MESSAGE_PREFIX, isFocusBlockMessage, isFocusRichTextBlockMessage } from './messages'
 
 function getPreviewIframe(): HTMLIFrameElement | null {
   return document.querySelector<HTMLIFrameElement>(
-    'iframe.live-preview-iframe, iframe[src*="/preview"], iframe[title*="preview"]',
+    'iframe#live-preview-iframe, iframe.live-preview-iframe, iframe[src*="/preview"], iframe[title*="preview"]',
   )
 }
 
@@ -21,6 +21,11 @@ function extractBlockLocation(el: Element): { field: string; index: number } | n
 
 function findBlockRow(field: string, index: number): Element | null {
   return document.querySelector(`[id="${field}-row-${index}"]`)
+}
+
+function extractRichTextBlockId(el: Element): string | null {
+  const block = el.closest('[data-block-id]')
+  return block?.getAttribute('data-block-id') ?? null
 }
 
 function expandIfCollapsed(row: Element): void {
@@ -96,29 +101,97 @@ export const AdminBlockSyncProvider: React.FC<Props> = ({ children, accentColor,
       if (!target) return
 
       if ((target as Element).closest('.collapsible__toggle')) return
-
-      const location = extractBlockLocation(target)
-      if (!location) return
+      if ((target as Element).closest(`[${ATTR_IGNORE}]`)) return
 
       const iframe = getPreviewIframe()
       if (!iframe?.contentWindow) return
 
-      const message: ScrollToBlockMessage = {
-        type: `${MESSAGE_PREFIX}scroll-to-block`,
-        field: location.field,
-        index: location.index,
+      const location = extractBlockLocation(target)
+      if (location) {
+        // If the row is inside a Lexical richText block, scope by parent block ID
+        const lexicalParent = target.closest('[data-block-id]')
+        if (lexicalParent) {
+          const richTextBlockId = lexicalParent.getAttribute('data-block-id')
+          if (richTextBlockId) {
+            const message: ScrollToRichTextNestedBlockMessage = {
+              type: `${MESSAGE_PREFIX}scroll-to-richtext-nested-block`,
+              richTextBlockId,
+              index: location.index,
+            }
+            iframe.contentWindow.postMessage(message, '*')
+            return
+          }
+        }
+
+        const message: ScrollToBlockMessage = {
+          type: `${MESSAGE_PREFIX}scroll-to-block`,
+          field: location.field,
+          index: location.index,
+        }
+        iframe.contentWindow.postMessage(message, '*')
+        return
       }
 
-      iframe.contentWindow.postMessage(message, '*')
+      const blockId = extractRichTextBlockId(target)
+      if (blockId) {
+        const message: ScrollToRichTextBlockMessage = {
+          type: `${MESSAGE_PREFIX}scroll-to-richtext-block`,
+          blockId,
+        }
+        iframe.contentWindow.postMessage(message, '*')
+      }
     }
 
     function handleMessage(e: MessageEvent) {
+      if (isFocusRichTextBlockMessage(e.data)) {
+        const iframe = getPreviewIframe()
+        if (!iframe?.contentWindow || e.source !== iframe.contentWindow) return
+
+        const el = document.querySelector(`[data-block-id="${e.data.blockId}"]`)
+        if (!el) return
+
+        const wasCollapsed = !!el.querySelector('.collapsible--collapsed')
+        expandIfCollapsed(el)
+
+        setTimeout(() => {
+          scrollToElement(el, scrollAlign, scrollOffset)
+          flashHighlightRow(el, colors)
+        }, wasCollapsed ? 350 : 0)
+        return
+      }
+
       if (!isFocusBlockMessage(e.data)) return
 
       const iframe = getPreviewIframe()
       if (!iframe?.contentWindow || e.source !== iframe.contentWindow) return
 
-      const { field, index } = e.data
+      const { field, index, richTextBlockId } = e.data
+
+      // Nested block inside a richText Lexical block
+      if (richTextBlockId) {
+        const parent = document.querySelector(`[data-block-id="${richTextBlockId}"]`)
+        if (!parent) return
+
+        const wasParentCollapsed = !!parent.querySelector('.collapsible--collapsed')
+        expandIfCollapsed(parent)
+
+        setTimeout(() => {
+          // Use local field name (last segment) to scope within the parent form
+          const localField = field.split('-').pop() ?? field
+          const row = parent.querySelector(`[id="${localField}-row-${index}"]`)
+          if (!row) return
+
+          const wasRowCollapsed = !!row.querySelector('.collapsible--collapsed')
+          expandIfCollapsed(row)
+
+          setTimeout(() => {
+            scrollToElement(row, scrollAlign, scrollOffset)
+            flashHighlightRow(row, colors)
+          }, wasRowCollapsed ? 350 : 0)
+        }, wasParentCollapsed ? 350 : 0)
+        return
+      }
+
       const ancestorIds = getAncestorRowIds(field)
 
       ancestorIds.forEach((id) => {

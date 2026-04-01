@@ -27,6 +27,11 @@
       "import": "./dist/client.js",
       "types": "./dist/client.d.ts",
       "default": "./dist/client.js"
+    },
+    "./lexical": {
+      "import": "./dist/lexicalFeature/feature.client.js",
+      "types": "./dist/lexicalFeature/feature.client.d.ts",
+      "default": "./dist/lexicalFeature/feature.client.js"
     }
   },
   "main": "./dist/index.js",
@@ -54,13 +59,13 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
-    "@payloadcms/db-mongodb": "3.68.5",
-    "@payloadcms/db-postgres": "3.68.5",
-    "@payloadcms/db-sqlite": "3.68.5",
+    "@payloadcms/db-mongodb": "3.81.0",
+    "@payloadcms/db-postgres": "3.81.0",
+    "@payloadcms/db-sqlite": "3.81.0",
     "@payloadcms/eslint-config": "3.9.0",
-    "@payloadcms/next": "3.68.5",
-    "@payloadcms/richtext-lexical": "3.68.5",
-    "@payloadcms/ui": "3.68.5",
+    "@payloadcms/next": "3.81.0",
+    "@payloadcms/richtext-lexical": "3.81.0",
+    "@payloadcms/ui": "3.81.0",
     "@playwright/test": "1.58.2",
     "@swc-node/register": "1.10.9",
     "@swc/cli": "0.6.0",
@@ -75,7 +80,7 @@
     "mongodb-memory-server": "10.1.4",
     "next": "15.4.11",
     "open": "^10.1.0",
-    "payload": "3.68.5",
+    "payload": "3.81.0",
     "prettier": "^3.4.2",
     "qs-esm": "7.0.2",
     "react": "19.2.1",
