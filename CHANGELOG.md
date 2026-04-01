@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org).
 
+## [Unreleased]
+### Added
+- RichText (Lexical) block sync — full bi-directional sync for blocks embedded inside Lexical richText fields
+- `BetterPreviewLexicalFeature` — server feature that stamps `data-block-id` onto every block decorator element in the Lexical editor DOM; exported from `payload-better-preview`
+- `BetterPreviewClientFeature` — client feature exported from `payload-better-preview/lexical`
+- `data-preview-ignore` attribute — add to any element (in preview or in admin custom block components) to prevent clicks on it from triggering scroll sync in either direction
+- New message types: `scroll-to-richtext-block`, `focus-richtext-block`, `scroll-to-richtext-nested-block`; optional `richTextBlockId` field on `FocusBlockMessage`
+### Fixed
+- **BREAKING**: Updated iframe selector from `iframe.live-preview-iframe` (class) to `iframe#live-preview-iframe` (ID) — required for compatibility with latest Payload versions which changed the live preview iframe rendering and no longer sets the class on the element
+
 ## [2.0.0] 2026-03-23
 ### Added
 - Nested block support — bi-directional sync works at any block nesting depth, ancestor rows are automatically expanded
