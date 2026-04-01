@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 - `data-preview-ignore` attribute — add to any element (in preview or in admin custom block components) to prevent clicks on it from triggering scroll sync in either direction
 - New message types: `scroll-to-richtext-block`, `focus-richtext-block`, `scroll-to-richtext-nested-block`; optional `richTextBlockId` field on `FocusBlockMessage`
 ### Fixed
-- **BREAKING**: Updated iframe selector from `iframe.live-preview-iframe` (class) to `iframe#live-preview-iframe` (ID) — required for compatibility with latest Payload versions which changed the live preview iframe rendering and no longer sets the class on the element
+- **BREAKING**: Updated iframe selector from `iframe.live-preview-iframe` (class) to `iframe#live-preview-iframe` (ID) — required for compatibility with v3.81.0+ Payload version which changed the live preview iframe rendering and no longer sets the class on the element
 
 ## [2.0.0] 2026-03-23
 ### Added
