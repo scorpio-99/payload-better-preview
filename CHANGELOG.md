@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [Unreleased]
+## [2.1.0]
 ### Added
 - RichText (Lexical) block sync — full bi-directional sync for blocks embedded inside Lexical richText fields
 - `BetterPreviewLexicalFeature` — server feature that stamps `data-block-id` onto every block decorator element in the Lexical editor DOM; exported from `payload-better-preview`
@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 - New message types: `scroll-to-richtext-block`, `focus-richtext-block`, `scroll-to-richtext-nested-block`; optional `richTextBlockId` field on `FocusBlockMessage`
 ### Fixed
 - Fixed live preview iframe detection for Payload 3.81+ which no longer sets the `live-preview-iframe` class on the iframe element; selector now checks ID first (`iframe#live-preview-iframe`) with fallbacks for older versions
+### Compatibility
+- **`BetterPreviewLexicalFeature` requires Payload 3.81+** — on older versions the plugin component is rendered outside of the `LexicalComposerContext` during SSR and throws. The core block sync (hover, layout blocks, Admin ↔ Preview sync) still works on Payload ^3.0.0; only the new richText-block sync is gated on 3.81+.
 
 ## [2.0.0] 2026-03-23
 ### Added

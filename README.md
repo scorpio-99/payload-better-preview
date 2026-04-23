@@ -146,6 +146,8 @@ export function NestedBlockRenderer({ block, index, field }) {
 
 Payload's Lexical editor supports blocks embedded directly inside richText fields. The plugin provides full bi-directional sync for these blocks too.
 
+> **Requires Payload 3.81+.** On older versions the Lexical plugin component is rendered outside of the `LexicalComposerContext` during SSR and throws. The core block sync (layout blocks, hover highlighting, Admin ↔ Preview sync) still works on Payload ^3.0.0 — only the richText-block sync is gated on 3.81+.
+
 ### 1. Register the Lexical feature
 
 Add `BetterPreviewLexicalFeature` to your Lexical editor config. This injects a client-side plugin that stamps each block in the editor with a `data-block-id` attribute so the admin can locate them:

@@ -1,6 +1,6 @@
 {
   "name": "payload-better-preview",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Better live preview for Payload CMS — hover highlighting, bi-directional admin ↔ preview sync, and click-to-focus",
   "license": "MIT",
   "author": "scorpio-99",
@@ -93,7 +93,13 @@
     "vitest": "4.0.18"
   },
   "peerDependencies": {
+    "@payloadcms/richtext-lexical": "^3.81.0",
     "payload": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@payloadcms/richtext-lexical": {
+      "optional": true
+    }
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",
