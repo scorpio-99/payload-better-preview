@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ATTR, ATTR_INDEX, ATTR_FIELD, DEFAULT_ACCENT_COLOR, makeColors } from './constants'
-import { isScrollToBlockMessage, MESSAGE_PREFIX } from './messages'
-import type { FocusBlockMessage } from './messages'
+import { ATTR, ATTR_INDEX, ATTR_FIELD, ATTR_BLOCK_ID, ATTR_IGNORE, DEFAULT_ACCENT_COLOR, makeColors } from './constants'
+import { isScrollToBlockMessage, isScrollToRichTextBlockMessage, isScrollToRichTextNestedBlockMessage, MESSAGE_PREFIX } from './messages'
+import type { FocusBlockMessage, FocusRichTextBlockMessage } from './messages'
 import {
   createOverlay,
   createLabel,
@@ -115,14 +115,7 @@ export const BetterPreview: React.FC<Props> = ({ accentColor, showToggle = true,
       rafRef.current = requestAnimationFrame(updatePosition)
     }
 
-    function handleMessage(e: MessageEvent) {
-      if (!isScrollToBlockMessage(e.data)) return
-
-      const block = document.querySelector(
-        `[${ATTR_FIELD}="${e.data.field}"][${ATTR_INDEX}="${e.data.index}"]`,
-      )
-      if (!block) return
-
+    function scrollAndHighlight(block: Element) {
       currentBlockRef.current = block
       const rect = block.getBoundingClientRect()
       const parent = block.parentElement?.closest(`[${ATTR}]`)
@@ -149,28 +142,72 @@ export const BetterPreview: React.FC<Props> = ({ accentColor, showToggle = true,
       setTimeout(() => flashHighlight(block, colors), 400)
     }
 
+    function handleMessage(e: MessageEvent) {
+      if (isScrollToRichTextNestedBlockMessage(e.data)) {
+        const parent = document.querySelector(`[${ATTR_BLOCK_ID}="${e.data.richTextBlockId}"]`)
+        if (!parent) return
+        const block = parent.querySelector(`[${ATTR_INDEX}="${e.data.index}"]`)
+        if (block) scrollAndHighlight(block)
+        return
+      }
+
+      if (isScrollToRichTextBlockMessage(e.data)) {
+        const block = document.querySelector(`[${ATTR_BLOCK_ID}="${e.data.blockId}"]`)
+        if (block) scrollAndHighlight(block)
+        return
+      }
+
+      if (!isScrollToBlockMessage(e.data)) return
+
+      const block = document.querySelector(
+        `[${ATTR_FIELD}="${e.data.field}"][${ATTR_INDEX}="${e.data.index}"]`,
+      )
+      if (!block) return
+
+      scrollAndHighlight(block)
+    }
+
     function handleClick(e: MouseEvent) {
       const target = e.target as Element | null
       if (!target) return
 
+      if (target.closest(`[${ATTR_IGNORE}]`)) return
+
       const block = target.closest(`[${ATTR}]`)
       if (!block) return
 
-      const indexStr = block.getAttribute(ATTR_INDEX)
-      if (indexStr == null) return
-
-      const index = Number(indexStr)
-      if (Number.isNaN(index)) return
-
       const field = block.getAttribute(ATTR_FIELD)
-      if (!field) return
+      const indexStr = block.getAttribute(ATTR_INDEX)
 
-      const message: FocusBlockMessage = {
-        type: `${MESSAGE_PREFIX}focus-block`,
-        field,
-        index,
+      if (field && indexStr != null) {
+        const index = Number(indexStr)
+        if (Number.isNaN(index)) return
+
+        // If nested inside a richText block (parent has data-block-id but no data-block-field)
+        const parentWithId = block.parentElement?.closest(`[${ATTR_BLOCK_ID}]`)
+        const richTextBlockId =
+          parentWithId && !parentWithId.hasAttribute(ATTR_FIELD)
+            ? (parentWithId.getAttribute(ATTR_BLOCK_ID) ?? undefined)
+            : undefined
+
+        const message: FocusBlockMessage = {
+          type: `${MESSAGE_PREFIX}focus-block`,
+          field,
+          index,
+          ...(richTextBlockId !== undefined && { richTextBlockId }),
+        }
+        window.parent.postMessage(message, '*')
+        return
       }
-      window.parent.postMessage(message, '*')
+
+      const blockId = block.getAttribute(ATTR_BLOCK_ID)
+      if (blockId) {
+        const message: FocusRichTextBlockMessage = {
+          type: `${MESSAGE_PREFIX}focus-richtext-block`,
+          blockId,
+        }
+        window.parent.postMessage(message, '*')
+      }
     }
 
     document.addEventListener('mouseover', handleMouseOver)

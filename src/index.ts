@@ -2,6 +2,7 @@ import type { Config } from 'payload'
 import type { BetterPreviewConfig } from './types'
 
 export type { BetterPreviewConfig }
+export { BetterPreviewLexicalFeature } from './lexicalFeature/feature.server'
 
 export const betterPreview =
   (pluginOptions?: BetterPreviewConfig) =>

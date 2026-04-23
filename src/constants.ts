@@ -2,6 +2,8 @@ export const ATTR = 'data-block'
 export const ATTR_INDEX = 'data-block-index'
 export const ATTR_NAME = 'data-block-name'
 export const ATTR_FIELD = 'data-block-field'
+export const ATTR_BLOCK_ID = 'data-block-id'
+export const ATTR_IGNORE = 'data-preview-ignore'
 
 export const DEFAULT_ACCENT_COLOR = '#3b82f6'
 
