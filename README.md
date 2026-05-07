@@ -1,5 +1,10 @@
 # payload-better-preview
 
+[![npm](https://img.shields.io/npm/v/payload-better-preview?logo=npm&color=ce421b)](https://www.npmjs.com/package/payload-better-preview)
+[![downloads](https://img.shields.io/npm/dt/payload-better-preview?logo=npm&color=ce421b)](https://www.npmjs.com/package/payload-better-preview)
+[![issues](https://img.shields.io/github/issues/scorpio-99/payload-better-preview?logo=github&color=blue)](https://github.com/scorpio-99/payload-better-preview/issues)
+[![stars](https://img.shields.io/github/stars/scorpio-99/payload-better-preview?logo=github)](https://github.com/scorpio-99/payload-better-preview)
+
 Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, bi-directional admin/preview sync, and smooth transitions.
 
 > **Found a bug?** Please [open an issue](https://github.com/scorpio-99/payload-better-preview/issues/new) with steps to reproduce, your Payload version, and a minimal example. PRs welcome too.
