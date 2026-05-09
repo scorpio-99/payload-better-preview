@@ -5,6 +5,8 @@
 [![issues](https://img.shields.io/github/issues/scorpio-99/payload-better-preview?logo=github&color=blue)](https://github.com/scorpio-99/payload-better-preview/issues)
 [![stars](https://img.shields.io/github/stars/scorpio-99/payload-better-preview?logo=github)](https://github.com/scorpio-99/payload-better-preview)
 
+> ⚠️ **Consider using the successor [`payload-better-editor`](https://github.com/scorpio-99/payload-better-editor).** It offers the same as this plugin, but also adds a side-by-side overlay with a sidebar of native Payload fields, viewport switching (Desktop / Tablet / Mobile / Responsive / Fullscreen), undo/redo, in-sidebar block actions (move, duplicate, add-below, delete), drag-resizable sidebar, an interact mode for clicks inside the preview, and a `BetterEditorSettings` global so admins can tune sidebar position, hover colours, and breakpoints live without a re-deploy.
+
 Better live preview for [Payload CMS](https://payloadcms.com) — hover highlighting with block identification, bi-directional admin/preview sync, and smooth transitions.
 
 > **Found a bug?** Please [open an issue](https://github.com/scorpio-99/payload-better-preview/issues/new) with steps to reproduce, your Payload version, and a minimal example. PRs welcome too.

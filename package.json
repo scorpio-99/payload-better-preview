@@ -1,6 +1,6 @@
 {
   "name": "payload-better-preview",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Better live preview for Payload CMS — hover highlighting with block identification, bi-directional admin/preview sync, and smooth transitions.",
   "license": "MIT",
   "author": "scorpio-99",
