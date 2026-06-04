@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org).
 
+## [2.1.3]
+### Internal
+- Added CI (build, lint, and a pack dry-run) plus bug/feature issue templates and a PR template.
+- Added an ESLint flat config and enabled the `lint` script; typed away two `no-explicit-any` in the Lexical plugin.
+- Slimmed down `.gitignore` to the essentials.
+
 ## [2.1.2]
 ### Docs
 - README: add notice at the top recommending [`payload-better-editor`](https://github.com/scorpio-99/payload-better-editor) as the successor — it covers the same hover / click-to-edit / admin↔preview-sync surface as this plugin and additionally provides a full side-by-side editor (live-preview iframe, native-field sidebar, viewport switching, undo/redo).
