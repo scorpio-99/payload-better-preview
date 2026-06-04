@@ -4,6 +4,11 @@ import type { PluginComponent } from '@payloadcms/richtext-lexical'
 import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
 import { useEffect } from 'react'
 
+type MaybeBlockNode = {
+  getType?: () => string
+  getFields?: () => { id?: string } | undefined
+}
+
 export const BetterPreviewLexicalPlugin: PluginComponent = () => {
   const [editor] = useLexicalComposerContext()
 
@@ -12,7 +17,8 @@ export const BetterPreviewLexicalPlugin: PluginComponent = () => {
       const blockNodes: Array<{ key: string; id: string }> = []
 
       editorState.read(() => {
-        const nodeMap = (editorState as any)._nodeMap as Map<string, any>
+        const nodeMap = (editorState as unknown as { _nodeMap: Map<string, MaybeBlockNode> })
+          ._nodeMap
         for (const [nodeKey, node] of nodeMap) {
           const type = node.getType?.()
           if (type === 'block' || type === 'inlineBlock') {
